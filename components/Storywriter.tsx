@@ -11,10 +11,18 @@ import {
 import { Button } from "./ui/button";
 
 function Storywriter() {
+  const [storyInput, setStoryInput] = useState<string>("");
+  const [storyPages, setStoryPage] = useState<number>();
+
   return (
     <div className="flex flex-col container">
-      <section className="flex-1 flex flex-col border border-purple-800 rounded-md p-10 space-y-2">
-        <Textarea placeholder="Write a story about a robot and a human who become friends..." />
+      <section className="flex-1 flex flex-col rounded-md p-10 space-y-2">
+        <Textarea
+          onChange={(e) => setStoryInput(e.target.value)}
+          value={storyInput}
+          className="flex-1 text-black"
+          placeholder="Write a story about a robot and a human who become friends..."
+        />
         <Select>
           <SelectTrigger>
             <SelectValue placeholder="How many pages should the story be?" />
@@ -30,7 +38,9 @@ function Storywriter() {
           </SelectContent>
         </Select>
 
-        <Button className="w-full">Generate Story</Button>
+        <Button className="w-full" size="lg">
+          Generate Story
+        </Button>
       </section>
       <section className="flex-1 pb-5 mt-5 bg-pink-200"></section>
     </div>

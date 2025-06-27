@@ -26,9 +26,7 @@ export default function Home() {
 
         {/* story writer  */}
 
-        <div>
-          <Storywriter />
-        </div>
+        <Storywriter />
       </section>
     </main>
   );
