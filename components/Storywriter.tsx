@@ -10,24 +10,64 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 
+const storiesPath = "public/stories";
+
 function Storywriter() {
-  const [storyInput, setStoryInput] = useState<string>("");
-  const [storyPages, setStoryPages] = useState<number>();
+  const [story, setStory] = useState<string>("");
+  const [pages, setPages] = useState<number>();
   const [progress, setProgress] = useState<string>("");
   const [runStarted, setRunStarted] = useState<boolean>(false);
   const [runFinished, setRunFinished] = useState<boolean | null>(null);
   const [currentTool, setCurrentTool] = useState("");
 
+  async function runScript() {
+    setRunStarted(true);
+    setRunFinished(false);
+
+    const response = await fetch("/api/run-script", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ story, pages, path: storiesPath }),
+    });
+
+    if (response.ok && response.body) {
+      console.log("streaming started");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      handleStream(reader, decoder);
+    } else {
+      setRunFinished(true);
+      setRunStarted(false);
+      console.error("failed to start stream");
+    }
+  }
+
+  async function handleStream(
+    reader: ReadableStreamDefaultReader<Uint8Array>,
+    decoder: TextDecoder
+  ) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+    }
+  }
+
   return (
     <div className="flex flex-col container mx-auto">
       <section className="flex-1 flex flex-col rounded-md p-10 space-y-2">
         <Textarea
-          onChange={(e) => setStoryInput(e.target.value)}
-          value={storyInput}
+          onChange={(e) => setStory(e.target.value)}
+          value={story}
           className="flex-1 text-black"
           placeholder="Write a story about a robot and a human who become friends..."
         />
-        <Select onValueChange={(value) => setStoryPages(parseInt(value))}>
+        <Select onValueChange={(value) => setPages(parseInt(value))}>
           <SelectTrigger>
             <SelectValue placeholder="How many pages should the story be?" />
           </SelectTrigger>
@@ -43,9 +83,10 @@ function Storywriter() {
         </Select>
 
         <Button
-          disabled={!storyInput || !storyPages}
+          disabled={!story || !pages || runStarted}
           className="w-full"
           size="lg"
+          onClick={runScript}
         >
           Generate Story
         </Button>
