@@ -9,6 +9,8 @@ import {
   SelectItem,
 } from "./ui/select";
 import { Button } from "./ui/button";
+import { Frame } from "@gptscript-ai/gptscript";
+import renderEventMessage from "@/lib/renderEventMessage";
 
 const storiesPath = "public/stories";
 
@@ -19,6 +21,7 @@ function Storywriter() {
   const [runStarted, setRunStarted] = useState<boolean>(false);
   const [runFinished, setRunFinished] = useState<boolean | null>(null);
   const [currentTool, setCurrentTool] = useState("");
+  const [events, setEvents] = useState<Frame[]>([]);
 
   async function runScript() {
     setRunStarted(true);
@@ -55,6 +58,37 @@ function Storywriter() {
       if (done) break;
 
       const chunk = decoder.decode(value, { stream: true });
+
+      const eventData = chunk
+        .split("\n\n")
+        .filter((line) => {
+          return line.startsWith("event");
+        })
+        .map((line) => {
+          return line.replace(/^event : /, "");
+        });
+
+      eventData.forEach((data) => {
+        try {
+          const parsedData = JSON.parse(data);
+
+          if (parsedData.type === "callProgress") {
+            setProgress(
+              parsedData.output[parsedData.output.length - 1].content
+            );
+            setCurrentTool(parsedData.tool?.description || "");
+          } else if (parsedData.type === "callStart") {
+            setCurrentTool(parsedData.tool?.description || "");
+          } else if (parsedData.type === "runFinished") {
+            setRunFinished(true);
+            setRunStarted(false);
+          } else {
+            setEvents((prevEvents) => [...prevEvents, parsedData]);
+          }
+        } catch (error) {
+          console.log(error, "failed to parse the JSON");
+        }
+      });
     }
   }
 
@@ -104,14 +138,21 @@ function Storywriter() {
             <span className="mr-5">{">>"}</span>
             {progress}
           </div>
-
           {currentTool && (
             <div className="py-10">
               <span className="mr-5">{`--- [Current Tool] --- `}</span>
               {currentTool}
             </div>
           )}
-
+          ;
+          <div className="space-y-5">
+            {events.map((event, index) => (
+              <div key={index}>
+                <span className="mr-5">{">>"}</span>
+                {renderEventMessage(event)}
+              </div>
+            ))}
+          </div>
           {runStarted && (
             <div>
               <span className="mr-5 animate-in">{`--- [AI Storyteller Has Started!] --- `}</span>
