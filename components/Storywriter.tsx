@@ -62,10 +62,10 @@ function Storywriter() {
       const eventData = chunk
         .split("\n\n")
         .filter((line) => {
-          return line.startsWith("event");
+          return line.startsWith("event:");
         })
         .map((line) => {
-          return line.replace(/^event : /, "");
+          return line.replace(/^event: /, "");
         });
 
       eventData.forEach((data) => {

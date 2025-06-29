@@ -7,8 +7,10 @@ const script = "app/api/run-script/story-book.gpt";
 export async function POST(request: NextRequest) {
   const { story, pages, path } = await request.json();
 
+  const safeStory = story.replace(/"/g, '\\"');
+
   const opts: RunOpts = {
-    input: `--story ${story} --pages ${pages} --path ${path}`,
+    input: `--story ${safeStory} --pages ${pages} --path ${path}`,
   };
 
   try {
@@ -24,7 +26,15 @@ export async function POST(request: NextRequest) {
             );
           });
 
+          console.log("Starting run...");
           await run.text();
+          console.log("Run finished.");
+
+          controller.enqueue(
+            encoder.encode(
+              `event: ${JSON.stringify({ type: "runFinished" })}\n\n`
+            )
+          );
           controller.close();
         } catch (error) {
           controller.error(error);
@@ -36,7 +46,7 @@ export async function POST(request: NextRequest) {
     return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
-        "Cache-Central": "no-cache",
+        "Cache-Control": "no-cache",
         Connection: "keep-alive",
       },
     });
