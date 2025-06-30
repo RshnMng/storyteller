@@ -6,20 +6,30 @@ args: path: The path that the story should be written to
 
 Do the following steps one after the other without skipping any or ending early:
 
-1. If the ${story} is inappropriate for children, abort the process and site the reason why.
-2. Come up with an appropriate title for the story based on the ${story}.
-3. Sanitize the title by replacing spaces with dashes and removing invalid characters:
+
+1. Come up with an appropriate title for the story based on the ${story}.
+2. Sanitize the title by replacing spaces with dashes and removing invalid characters:
    sanitized-title=$(echo "${story-title}" | sed -e 's/ /-/g' -e 's/[^a-zA-Z0-9-_]//g')
-4. Echo the target directory for debugging:
+
+3. Echo the target directory for debugging:
    echo "📁 Target dir: ${path}/${sanitized-title}" >&2
-5. Create the directory if it does not exist:
-   mkdir -p "${path}/${sanitized-title}"
-6. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt.
-7. For every page of the story you got from the story-writer, do the following:
+   echo "✅ path=${path}" >&2
+   echo "✅ sanitized-title=${sanitized-title}" >&2
+
+4. Create the directory if it does not exist:
+   mkdir --dir "${path}/${sanitized-title}"
+
+
+
+5. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt.
+6. For every page of the story you got from the story-writer, do the following:
    - For the content of the page, write it to `${path}/${sanitized-title}/page<page-number>.txt.
-   - Call story-illustrator to illustrate it. Be sure to include the character's descriptions, setting's decriptions
+
+7. For every page of the story, Call story-illustrator to illustrate it. Be sure to include the character's descriptions, setting's decriptions
      and illustration style you got from the story-writer when asking story-illustrator to illustrate the page.
-   - Download the illustration to a file at `${path}/${sanitized-title}/page<page_number>.png`.
+   - Download the illustration to a file at `${path}/${story-title}/page<page_number>.png`.
+
+
 
 ---
 name: story-writer
@@ -61,10 +71,7 @@ You are only allowed to try again 2 maximum.
 
 ---
 name: mkdir
-tools: sys.write
 description: Creates a specified directory
 args: dir: Path to the directory to be created. Will create parent directories.
 
-#!bash
 
-mkdir -p "${dir}"
