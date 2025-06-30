@@ -8,15 +8,18 @@ Do the following steps one after the other without skipping any or ending early:
 
 1. If the ${story} is inappropriate for children, abort the process and site the reason why.
 2. Come up with an appropriate title for the story based on the ${story}.
-3. Create the `${path}/${story-title}` directory if it does not already exist. Replace any spaces in the title
-   with - when creating the directory.
-4. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt.
-5. If the generated story is not appropriate for children, abort the process and cite the reason why.
-6. For every page of the story you got from the story-writer, do the following:
-   - For the content of the page, write it to `${path}/${story-title}/page<page-number>.txt.
+3. Sanitize the title by replacing spaces with dashes and removing invalid characters:
+   sanitized-title=$(echo "${story-title}" | sed -e 's/ /-/g' -e 's/[^a-zA-Z0-9-_]//g')
+4. Echo the target directory for debugging:
+   echo "📁 Target dir: ${path}/${sanitized-title}" >&2
+5. Create the directory if it does not exist:
+   mkdir -p "${path}/${sanitized-title}"
+6. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt.
+7. For every page of the story you got from the story-writer, do the following:
+   - For the content of the page, write it to `${path}/${sanitized-title}/page<page-number>.txt.
    - Call story-illustrator to illustrate it. Be sure to include the character's descriptions, setting's decriptions
      and illustration style you got from the story-writer when asking story-illustrator to illustrate the page.
-   - Download the illustration to a file at `${path}/${story-title}/page<page_number>.png`.
+   - Download the illustration to a file at `${path}/${sanitized-title}/page<page_number>.png`.
 
 ---
 name: story-writer
