@@ -11,6 +11,7 @@ import {
 import { Button } from "./ui/button";
 import { Frame } from "@gptscript-ai/gptscript";
 import renderEventMessage from "@/lib/renderEventMessage";
+import { v4 as uuidv4 } from "uuid";
 
 const storiesPath = "./public/stories";
 
@@ -53,43 +54,62 @@ function Storywriter() {
     reader: ReadableStreamDefaultReader<Uint8Array>,
     decoder: TextDecoder
   ) {
+    let buffer = "";
+
     while (true) {
       const { done, value } = await reader.read();
-
       if (done) break;
 
-      const chunk = decoder.decode(value, { stream: true });
+      buffer += decoder.decode(value, { stream: true });
 
-      const eventData = chunk
-        .split("\n\n")
-        .filter((line) => {
-          return line.startsWith("event:");
-        })
-        .map((line) => {
-          return line.replace(/^event: /, "");
-        });
+      const events = buffer.split("\n\n");
 
-      eventData.forEach((data) => {
-        try {
-          const parsedData = JSON.parse(data);
-
-          if (parsedData.type === "callProgress") {
-            setProgress(
-              parsedData.output[parsedData.output.length - 1].content
-            );
-            setCurrentTool(parsedData.tool?.description || "");
-          } else if (parsedData.type === "callStart") {
-            setCurrentTool(parsedData.tool?.description || "");
-          } else if (parsedData.type === "runFinished") {
-            setRunFinished(true);
-            setRunStarted(false);
-          } else {
-            setEvents((prevEvents) => [...prevEvents, parsedData]);
-          }
-        } catch (error) {
-          console.log(error, "failed to parse the JSON");
+      // Process all complete events except possibly incomplete last one
+      for (let i = 0; i < events.length - 1; i++) {
+        let eventStr = events[i];
+        if (eventStr.startsWith("event: ")) {
+          eventStr = eventStr.replace(/^event: /, "");
         }
-      });
+        try {
+          const parsedData = JSON.parse(eventStr);
+          handleParsedData(parsedData);
+        } catch (e) {
+          console.error("Failed to parse JSON:", e);
+        }
+      }
+
+      // Keep the last chunk (likely incomplete) in buffer
+      buffer = events[events.length - 1];
+    }
+
+    // After done, try to parse the remaining buffer if not empty
+    if (buffer.trim() !== "") {
+      let eventStr = buffer;
+      if (eventStr.startsWith("event: ")) {
+        eventStr = eventStr.replace(/^event: /, "");
+      }
+      try {
+        const parsedData = JSON.parse(eventStr);
+        handleParsedData(parsedData);
+      } catch (e) {
+        console.error("Failed to parse JSON at end of stream:", e);
+      }
+    }
+
+    function handleParsedData(parsedData: any) {
+      if (parsedData.type === "callProgress") {
+        setProgress(parsedData.output[parsedData.output.length - 1].content);
+        setCurrentTool(parsedData.tool?.description || "");
+      } else if (parsedData.type === "callStart") {
+        setCurrentTool(parsedData.tool?.description || "");
+      } else if (parsedData.type === "runFinished") {
+        setRunFinished(true);
+        setRunStarted(false);
+      } else {
+        const id = uuidv4();
+        setEvents((prevEvents) => [...prevEvents, { ...parsedData, id }]);
+        console.log(id, "ids");
+      }
     }
   }
 
@@ -147,8 +167,8 @@ function Storywriter() {
           )}
           ;
           <div className="space-y-5">
-            {events.map((event, index) => (
-              <div key={index}>
+            {events.map((event) => (
+              <div key={event.id}>
                 <span className="mr-5">{">>"}</span>
                 {renderEventMessage(event)}
               </div>
