@@ -108,7 +108,6 @@ function Storywriter() {
       } else {
         const id = uuidv4();
         setEvents((prevEvents) => [...prevEvents, { ...parsedData, id }]);
-        console.log(id, "ids");
       }
     }
   }
@@ -168,7 +167,7 @@ function Storywriter() {
           ;
           <div className="space-y-5">
             {events.map((event) => (
-              <div key={event.id}>
+              <div key={uuidv4()}>
                 <span className="mr-5">{">>"}</span>
                 {renderEventMessage(event)}
               </div>

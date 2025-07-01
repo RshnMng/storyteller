@@ -1,4 +1,6 @@
 import { Frame } from "@gptscript-ai/gptscript";
+import { v4 as uuidv4 } from "uuid";
+
 //
 function renderEventMessage(event: Frame) {
   switch (event.type) {
@@ -24,7 +26,7 @@ function renderEventMessage(event: Frame) {
         <div>
           Call finished:{" "}
           {event.output?.map((output) => {
-            return <div key={output.content}>{output.content}</div>;
+            return <div key={uuidv4()}>{output.content}</div>;
           })}
         </div>
       );
@@ -36,7 +38,7 @@ function renderEventMessage(event: Frame) {
         <div>
           Sub-calls in progress:
           {event.output?.map((output, index) => (
-            <div key={index}>
+            <div key={uuidv4()}>
               <div>{output.content}</div>
               {output.subCalls &&
                 Object.keys(output.subCalls).map((subCallKey) => {
@@ -57,7 +59,7 @@ function renderEventMessage(event: Frame) {
         <div>
           Call continues:
           {event.output?.map((output, index) => (
-            <div key={index}>
+            <div key={uuidv4()}>
               <div>{output.content}</div>
               {output.subCalls &&
                 Object.keys(output.subCalls).map((subCallKey) => {
@@ -79,7 +81,7 @@ function renderEventMessage(event: Frame) {
         <div>
           Call confirm:
           {event.output?.map((output, index) => (
-            <div key={index}>
+            <div key={uuidv4()}>
               <div>{output.content}</div>
               {output.subCalls &&
                 Object.keys(output.subCalls).map((subCallKey) => {
