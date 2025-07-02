@@ -21,13 +21,15 @@ Do the following steps one after the other without skipping any or ending early:
 
 
 
-5. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt.
-6. For every page of the story you got from the story-writer, do the following:
-   - For the content of the page, write it to `${path}/${sanitized-title}/page<page-number>.txt.
+5. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt. DO NOT DO NEXT STEP UNTIL THIS STEP HAS BEEN DONE. VERY IMPORTANT!
 
-7. For every page of the story, Call story-illustrator to illustrate it. Be sure to include the character's descriptions, setting's decriptions
+6. For every page of the story you got from the story-writer, do the following:
+   - For the content of the page, write it to `${path}/${sanitized-title}/page<page-number>.txt. 
+
+7. for every page of the story
+   - Call story-illustrator to illustrate it. Be sure to include the    character's descriptions, setting's decriptions
      and illustration style you got from the story-writer when asking story-illustrator to illustrate the page.
-   - Download the illustration to a file at `${path}/${story-title}/page<page_number>.png`.
+   - Download the illustration to a file at `{{path}}/{{story-title}}/page<page_number>.png`.
 
 
 
@@ -49,7 +51,7 @@ Return your story, illustration style, and character descriptions.
 
 ---
 name: story-illustrator
-tools: github.com/sonnysangha/dalle-image-generation
+tools: github.com/gptscript-ai/image-generation
 description: Generates a illustration for a children's story
 temperature: 1
 args: text: The text of the page to illustrate
@@ -57,12 +59,12 @@ args: characters: The characters of the story and their physical appearance
 args: settings: The settings of the story and their physical appearance. 
 args: style: The style that the image should be generated in.
 
-Think of a visually interesting prompt to generate an image to represent ${text}. If a character
+Think of a visually interesting prompt to generate an image to represent {{text}}. If a character
 is not present in the prompt, do not include them. If a setting is not included in the prompt, do
-not include it. Do not include the name of any characters or settings` in your prompt, just use their physical
-descriptions in ${characters} or ${settings} instead to ensure they look like they should. Check if your prompt
+not include it. Do not include the name of any characters or settings` in your prompt, just use their physical. Make sure the style and characters look the same in each page, make sure the style is the same for all generated images. Make it Disney style animation. 
+descriptions in {{characters}} or {{settings}} instead to ensure they look like they should. Check if your prompt
 is safe for children. If it is not, make a new one. Finally, use your prompt to generate an illustration. Append
-any prompt that you have with ". In an ${style} children's book style. DO NOT INCLUDE TEXT EVER.". Only return the
+any prompt that you have with ". In an {{style}} children's book style. DO NOT INCLUDE TEXT EVER.". Only return the
 URL of the illustration.
 
 If your image fails to download, try again with the same prompt.
@@ -71,7 +73,9 @@ You are only allowed to try again 2 maximum.
 
 ---
 name: mkdir
+sys.write
 description: Creates a specified directory
 args: dir: Path to the directory to be created. Will create parent directories.
+
 
 

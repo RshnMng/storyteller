@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  console.log(safeStory, "safe story");
+
   const opts: RunOpts = {
     input: `--story ${safeStory} --pages ${pages} --path ${absolutepath}`,
   };
