@@ -7,7 +7,8 @@ args: path: The path that the story should be written to
 Do the following steps one after the other without skipping any or ending early:
 
 
-1. Come up with an appropriate title for the story based on the ${story}.
+1. Come up with an appropriate title for the story based on the ${story} Do not use the word 'adventure' or 'adventures'.
+
 2. Sanitize the title by replacing spaces with dashes and removing invalid characters:
    sanitized-title=$(echo "${story-title}" | sed -e 's/ /-/g' -e 's/[^a-zA-Z0-9-_]//g')
 
@@ -24,11 +25,10 @@ Do the following steps one after the other without skipping any or ending early:
 5. If ${story} is a prompt and not a complete children's story, call story-writer to write a story based on the prompt. DO NOT DO NEXT STEP UNTIL THIS STEP HAS BEEN DONE. VERY IMPORTANT!
 
 6. For every page of the story you got from the story-writer, do the following:
-   - For the content of the page, write it to `${path}/${sanitized-title}/page<page-number>.txt. 
+   - For the content of the page, make sure the text for each page is at least two paragraphs long. Do not use the word 'bustling' -- dont over use words -- Write it to `${path}/${sanitized-title}/page<page-number>.txt. 
 
-7. for every page of the story
-   - Call story-illustrator to illustrate it. Be sure to include the    character's descriptions, setting's decriptions
-     and illustration style you got from the story-writer when asking story-illustrator to illustrate the page.
+   - Call story-illustrator to illustrate it. Be sure to include the character's descriptions, setting's decriptions -- make sure all the images look like they are in the same story. Make sure the characters look the same in all the images, make sure they look the same age in all the images, make sure they are the same style of animation in all the photos. Make sure the images are very consistent throughout the whole story. Whimsical watercolors, childlike, cartoon style animation. Make the characters look happy and make them look like characters in a story, personalize them in some way.
+
    - Download the illustration to a file at `{{path}}/{{story-title}}/page<page_number>.png`.
 
 
@@ -40,12 +40,12 @@ args: prompt: The prompt to use for the story
 args: pages: The number of pages that the story should have.
 temperature: 1
 
+
 You are an accomplished children's story writer. You like to write with a style that is appropriate for children but
-is still interesting to read. With your style, write a story based on ${prompt} that has ${pages} pages. Along with 
+is still interesting to read. Do not use the word 'adventure' or 'adventures' in the title. Do not use the word 'bustling'  With your style, write a story based on ${prompt} that has ${pages} pages. Along with 
 the story, write an extensive description of each character's physical appearance. Be sure to include things like hair
 color, skin tone, hair style, species, and any other signiciant characteristics. Write an extensive description of
-what settings in the story look like as well. Finally, determine what style that illustrations of this story should
-be written in using 5 or less words. If the ${prompt} provides one, use that.
+what settings in the story look like as well. For the illustration prompts make sure all the images look like they are in the same story. Make sure the characters look the same in all the images, make sure they look the same age in all the images, make sure they are the same style of animation in all the photos. Make sure the images are very consistent throughout the whole story. Whimsical watercolors, childlike, cartoon style animation. Make the characters look happy and make them look like characters in a story, personalize them in some way If the ${prompt} provides one, use that.
 
 Return your story, illustration style, and character descriptions.
 
@@ -61,7 +61,7 @@ args: style: The style that the image should be generated in.
 
 Think of a visually interesting prompt to generate an image to represent {{text}}. If a character
 is not present in the prompt, do not include them. If a setting is not included in the prompt, do
-not include it. Do not include the name of any characters or settings` in your prompt, just use their physical. Make sure the style and characters look the same in each page, make sure the style is the same for all generated images. Make it Disney style animation. 
+not include it. Do not include the name of any characters or settings` in your prompt, just use their physical. Make sure the style and characters look the same in each page, make sure the style is the same for all generated images. Make it in the 'bold and bright' childrens animation style. make sure all the images look like they are in the same story. Make sure the characters look the same in all the images, make sure they look the same age in all the images, make sure they are the same style of animation in all the photos. Make sure the images are very consistent throughout the whole story. Whimsical watercolors, childlike, cartoon style animation. Make the characters look happy and make them look like characters in a story, personalize them in some way
 descriptions in {{characters}} or {{settings}} instead to ensure they look like they should. Check if your prompt
 is safe for children. If it is not, make a new one. Finally, use your prompt to generate an illustration. Append
 any prompt that you have with ". In an {{style}} children's book style. DO NOT INCLUDE TEXT EVER.". Only return the

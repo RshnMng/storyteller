@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
 import {
   Select,
   SelectTrigger,
@@ -12,6 +13,7 @@ import { Button } from "./ui/button";
 import { Frame } from "@gptscript-ai/gptscript";
 import renderEventMessage from "@/lib/renderEventMessage";
 import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
 
 const storiesPath = "./public/stories";
 
@@ -23,6 +25,7 @@ function Storywriter() {
   const [runFinished, setRunFinished] = useState<boolean | null>(null);
   const [currentTool, setCurrentTool] = useState("");
   const [events, setEvents] = useState<Frame[]>([]);
+  const router = useRouter();
 
   async function runScript() {
     setRunStarted(true);
@@ -112,6 +115,21 @@ function Storywriter() {
     }
   }
 
+  useEffect(() => {
+    if (runFinished) {
+      toast.success("Story generated successfully", {
+        action: (
+          <Button
+            className="bg-purple-500 ml-auto"
+            onClick={() => router.push("/stories")}
+          >
+            View Stories
+          </Button>
+        ),
+      });
+    }
+  }, [runFinished, router]);
+
   return (
     <div className="flex flex-col container mx-auto">
       <section className="flex-1 flex flex-col rounded-md p-10 space-y-2">
@@ -146,7 +164,7 @@ function Storywriter() {
         </Button>
       </section>
       <section className="flex-1 pb-5 mt-5 bg-pink-200">
-        <div className="flex flex-col-reverse w-full space-y-2 bg-gray-800 rounded-md text-gray-200 font-mono p-10 h-96 everflow-y-scroll">
+        <div className="flex flex-col-reverse w-full space-y-2 bg-gray-800 rounded-md text-gray-200 font-mono p-10 h-96 overflow-y-scroll ">
           <div>
             {runFinished === null && (
               <>
